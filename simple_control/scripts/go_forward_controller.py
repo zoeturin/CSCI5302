@@ -11,7 +11,7 @@ from webots_ros.srv import *
 def callback(data):
     global vehicle_name
     vehicle_name = data.data
-    rospy.logwarn("Got name")
+    rospy.loginfo("Got vehicle name")
 
 def main():
 
@@ -31,12 +31,11 @@ def main():
     # - perform simulation steps until Webots is stopping the controller
     while vehicle_name is None:
         pass
-    rospy.logwarn("Waiting for service")
-    rospy.logwarn(vehicle_name)
+    rospy.loginfo("Waiting for services")
+    rospy.loginfo("Vehicle name:" + vehicle_name)
     rospy.wait_for_service(vehicle_name + "/automobile/set_throttle")
     rospy.wait_for_service(vehicle_name + "/automobile/set_gear")
-
-    rospy.logwarn("Got service")
+    rospy.loginfo("Got services")
     while True: #robot.step() != -1:
         # pc = lidar.getPointCloud();
         try:
