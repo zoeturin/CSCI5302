@@ -1,0 +1,168 @@
+Node [/vehicle_19596_zoe_xps_15]
+Publications:
+ * /model_name [std_msgs/String]
+ * /rosout [rosgraph_msgs/Log]
+ * /vehicle_19596_zoe_xps_15/automobile/brake_intensity [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/current_speed [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/front_left_wheel_encoder [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/front_left_wheel_speed [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/front_right_wheel_encoder [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/front_right_wheel_speed [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/left_steering_angle [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/rear_left_wheel_encoder [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/rear_left_wheel_speed [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/rear_right_wheel_encoder [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/rear_right_wheel_speed [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/right_steering_angle [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/rpm [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/steering_angle [webots_ros/Float64Stamped]
+ * /vehicle_19596_zoe_xps_15/automobile/throttle [webots_ros/Float64Stamped]
+
+Subscriptions: None
+
+Services:
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/enable
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/enable_point_cloud
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_frequency_info
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_info
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_layer_point_cloud
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_layer_range_image
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_model
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_name
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_node_type
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/is_point_cloud_enabled
+ * /vehicle_19596_zoe_xps_15/Sick_LMS_291/set_frequency
+ * /vehicle_19596_zoe_xps_15/automobile/enable_indicator_auto_disabling
+ * /vehicle_19596_zoe_xps_15/automobile/enable_limited_slip_differential
+ * /vehicle_19596_zoe_xps_15/automobile/get_antifog_light
+ * /vehicle_19596_zoe_xps_15/automobile/get_backwards_light
+ * /vehicle_19596_zoe_xps_15/automobile/get_brake_light
+ * /vehicle_19596_zoe_xps_15/automobile/get_control_mode
+ * /vehicle_19596_zoe_xps_15/automobile/get_cruising_speed
+ * /vehicle_19596_zoe_xps_15/automobile/get_dimensions
+ * /vehicle_19596_zoe_xps_15/automobile/get_dipped_beam
+ * /vehicle_19596_zoe_xps_15/automobile/get_engine_type
+ * /vehicle_19596_zoe_xps_15/automobile/get_gear
+ * /vehicle_19596_zoe_xps_15/automobile/get_gear_number
+ * /vehicle_19596_zoe_xps_15/automobile/get_hazard_flashers
+ * /vehicle_19596_zoe_xps_15/automobile/get_indicator
+ * /vehicle_19596_zoe_xps_15/automobile/get_indicator_period
+ * /vehicle_19596_zoe_xps_15/automobile/get_type
+ * /vehicle_19596_zoe_xps_15/automobile/get_wiper_mode
+ * /vehicle_19596_zoe_xps_15/automobile/get_wipers_mode
+ * /vehicle_19596_zoe_xps_15/automobile/set_antifog_light
+ * /vehicle_19596_zoe_xps_15/automobile/set_brake_intensity
+ * /vehicle_19596_zoe_xps_15/automobile/set_cruising_speed
+ * /vehicle_19596_zoe_xps_15/automobile/set_dipped_beam
+ * /vehicle_19596_zoe_xps_15/automobile/set_gear
+ * /vehicle_19596_zoe_xps_15/automobile/set_hazard_flashers
+ * /vehicle_19596_zoe_xps_15/automobile/set_indicator
+ * /vehicle_19596_zoe_xps_15/automobile/set_indicator_period
+ * /vehicle_19596_zoe_xps_15/automobile/set_steering_angle
+ * /vehicle_19596_zoe_xps_15/automobile/set_throttle
+ * /vehicle_19596_zoe_xps_15/automobile/set_wiper_mode
+ * /vehicle_19596_zoe_xps_15/automobile/set_wipers_mode
+ * /vehicle_19596_zoe_xps_15/battery_sensor/enable
+ * /vehicle_19596_zoe_xps_15/battery_sensor/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/engine_speaker/get_engine
+ * /vehicle_19596_zoe_xps_15/engine_speaker/get_language
+ * /vehicle_19596_zoe_xps_15/engine_speaker/get_model
+ * /vehicle_19596_zoe_xps_15/engine_speaker/get_name
+ * /vehicle_19596_zoe_xps_15/engine_speaker/get_node_type
+ * /vehicle_19596_zoe_xps_15/engine_speaker/is_sound_playing
+ * /vehicle_19596_zoe_xps_15/engine_speaker/is_speaking
+ * /vehicle_19596_zoe_xps_15/engine_speaker/play_sound
+ * /vehicle_19596_zoe_xps_15/engine_speaker/set_engine
+ * /vehicle_19596_zoe_xps_15/engine_speaker/set_language
+ * /vehicle_19596_zoe_xps_15/engine_speaker/speak
+ * /vehicle_19596_zoe_xps_15/engine_speaker/stop
+ * /vehicle_19596_zoe_xps_15/front_camera/enable
+ * /vehicle_19596_zoe_xps_15/front_camera/get_focus_info
+ * /vehicle_19596_zoe_xps_15/front_camera/get_info
+ * /vehicle_19596_zoe_xps_15/front_camera/get_model
+ * /vehicle_19596_zoe_xps_15/front_camera/get_name
+ * /vehicle_19596_zoe_xps_15/front_camera/get_node_type
+ * /vehicle_19596_zoe_xps_15/front_camera/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/front_camera/get_zoom_info
+ * /vehicle_19596_zoe_xps_15/front_camera/has_recognition
+ * /vehicle_19596_zoe_xps_15/front_camera/save_image
+ * /vehicle_19596_zoe_xps_15/front_camera/set_focal_distance
+ * /vehicle_19596_zoe_xps_15/front_camera/set_fov
+ * /vehicle_19596_zoe_xps_15/get_loggers
+ * /vehicle_19596_zoe_xps_15/gps/decimal_degrees_to_degrees_minutes_seconds
+ * /vehicle_19596_zoe_xps_15/gps/enable
+ * /vehicle_19596_zoe_xps_15/gps/get_coordinate_system
+ * /vehicle_19596_zoe_xps_15/gps/get_model
+ * /vehicle_19596_zoe_xps_15/gps/get_name
+ * /vehicle_19596_zoe_xps_15/gps/get_node_type
+ * /vehicle_19596_zoe_xps_15/gps/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/gyro/enable
+ * /vehicle_19596_zoe_xps_15/gyro/get_lookup_table
+ * /vehicle_19596_zoe_xps_15/gyro/get_model
+ * /vehicle_19596_zoe_xps_15/gyro/get_name
+ * /vehicle_19596_zoe_xps_15/gyro/get_node_type
+ * /vehicle_19596_zoe_xps_15/gyro/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/joystick/enable
+ * /vehicle_19596_zoe_xps_15/joystick/get_model
+ * /vehicle_19596_zoe_xps_15/joystick/get_number_of_axes
+ * /vehicle_19596_zoe_xps_15/joystick/get_number_of_povs
+ * /vehicle_19596_zoe_xps_15/joystick/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/joystick/is_connected
+ * /vehicle_19596_zoe_xps_15/joystick/set_auto_centering_gain
+ * /vehicle_19596_zoe_xps_15/joystick/set_constant_force
+ * /vehicle_19596_zoe_xps_15/joystick/set_constant_force_duration
+ * /vehicle_19596_zoe_xps_15/joystick/set_force_axis
+ * /vehicle_19596_zoe_xps_15/joystick/set_resistance_gain
+ * /vehicle_19596_zoe_xps_15/keyboard/enable
+ * /vehicle_19596_zoe_xps_15/keyboard/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/enable
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_brake_name
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_model
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_motor_name
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_name
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_node_type
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/left_steer_sensor/get_type
+ * /vehicle_19596_zoe_xps_15/rear_camera/enable
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_focus_info
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_info
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_model
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_name
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_node_type
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/rear_camera/get_zoom_info
+ * /vehicle_19596_zoe_xps_15/rear_camera/has_recognition
+ * /vehicle_19596_zoe_xps_15/rear_camera/save_image
+ * /vehicle_19596_zoe_xps_15/rear_camera/set_focal_distance
+ * /vehicle_19596_zoe_xps_15/rear_camera/set_fov
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/enable
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_brake_name
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_model
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_motor_name
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_name
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_node_type
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_sampling_period
+ * /vehicle_19596_zoe_xps_15/right_steer_sensor/get_type
+ * /vehicle_19596_zoe_xps_15/robot/get_basic_time_step
+ * /vehicle_19596_zoe_xps_15/robot/get_custom_data
+ * /vehicle_19596_zoe_xps_15/robot/get_data
+ * /vehicle_19596_zoe_xps_15/robot/get_device_list
+ * /vehicle_19596_zoe_xps_15/robot/get_mode
+ * /vehicle_19596_zoe_xps_15/robot/get_model
+ * /vehicle_19596_zoe_xps_15/robot/get_number_of_devices
+ * /vehicle_19596_zoe_xps_15/robot/get_project_path
+ * /vehicle_19596_zoe_xps_15/robot/get_supervisor
+ * /vehicle_19596_zoe_xps_15/robot/get_synchronization
+ * /vehicle_19596_zoe_xps_15/robot/get_time
+ * /vehicle_19596_zoe_xps_15/robot/get_type
+ * /vehicle_19596_zoe_xps_15/robot/get_urdf
+ * /vehicle_19596_zoe_xps_15/robot/get_world_path
+ * /vehicle_19596_zoe_xps_15/robot/set_custom_data
+ * /vehicle_19596_zoe_xps_15/robot/set_data
+ * /vehicle_19596_zoe_xps_15/robot/set_mode
+ * /vehicle_19596_zoe_xps_15/robot/time_step
+ * /vehicle_19596_zoe_xps_15/robot/wait_for_user_input_event
+ * /vehicle_19596_zoe_xps_15/robot/wwi_receive_text
+ * /vehicle_19596_zoe_xps_15/robot/wwi_send_text
+ * /vehicle_19596_zoe_xps_15/set_logger_level

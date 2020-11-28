@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="go_forward_controller" pkg="simple_control" type="go_forward_controller.py"/>
+</launch>
