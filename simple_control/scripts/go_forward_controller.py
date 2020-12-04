@@ -52,6 +52,7 @@ def main():
     set_gear.srv(1)
     # Misc
     dims = get_dimensions.srv()
+    print(dims)
     timestep = get_time_step.srv()
     # Sensors
     enable_front_camera.srv(30)
@@ -61,8 +62,11 @@ def main():
 
     while True: #robot.step() != -1:
         # pc = lidar.getPointCloud();
-        try
-        set_throttle.srv(1)
+
+        try:
+            set_throttle.srv(1)
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
 
 
