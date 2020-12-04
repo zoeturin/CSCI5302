@@ -7,7 +7,7 @@ To install webots_ros:
 
 git clone https://github.com/cyberbotics/webots_ros in the src directory of a catkin workspace. 
 
-Can instead run sudo apt install ros-melodic-webots-ros, but this seems to not be up to date (missing automobile_get_dimensions.srv)
+Can instead run sudo apt install ros-melodic-webots-ros, but this seems to not be up to date (missing automobile_get_dimensions.srv). A copy of automobile_get_dimensions.srv is in simple_control/srv so you can try uncommenting "from simple_control.srv import \*" in go_forward_controller but no guarantees this will work
 
 git clone this repo in the src file of your catkin workspace
 
