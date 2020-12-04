@@ -39,6 +39,7 @@ def main():
     get_time_step = service("/robot/get_basic_time_step", get_float)
     # Sensors
     enable_front_camera = service("/front_camera/enable", set_int)
+    enable_recognition = service("/front_camera/recognition_enable", set_int)
     enable_rear_camera = service("/rear_camera/enable", set_int)
     enable_lidar = service("/Sick_LMS_291/enable", set_int)
     enable_point_cloud = service("/Sick_LMS_291/enable_point_cloud", set_bool)
@@ -52,10 +53,13 @@ def main():
     set_gear.srv(1)
     # Misc
     dims = get_dimensions.srv()
-    print(dims)
+    TRACK = dims.trackRear
+    BASE = dims.wheelBase
+    WHEEL = dims.frontWheelRadius
     timestep = get_time_step.srv()
     # Sensors
     enable_front_camera.srv(30)
+    enable_recognition.srv(1)
     #enable_lidar.srv(timestep)
     enable_point_cloud.srv(True)
 
