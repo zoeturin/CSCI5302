@@ -44,6 +44,7 @@ def main():
     enable_lidar = service("/Sick_LMS_291/enable", set_int)
     enable_point_cloud = service("/Sick_LMS_291/enable_point_cloud", set_bool)
     enable_gps = service("/gps/enable", set_int)
+    enable_gyro = service("/gyro/enable", set_int)
 
     rospy.loginfo("All services ready")
 
@@ -60,6 +61,8 @@ def main():
     # Sensors
     enable_front_camera.srv(30)
     enable_recognition.srv(1)
+    enable_gps.srv(1)
+    enable_gyro.srv(1)
     #enable_lidar.srv(timestep)
     enable_point_cloud.srv(True)
 
