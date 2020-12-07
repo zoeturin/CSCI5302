@@ -6,6 +6,7 @@ from geometry_msgs.msg import Pose2D
 '''
 TODO:
 - add publisher for features (model, position)
+
 '''
 def vehicle_name_callback(name):
     global vehicle_name
