@@ -23,4 +23,6 @@ To run go_forward_controller: roslaunch simple_control main.launch
 
 PACKAGES: --------------------------------------------------------------------
 
-simple_control: makes car drive forward
+simple_control: makes car drive forward, can use as a template for other webots_ros controllers as it contains necessary subscribers and service calls 
+
+localization: EKF SLAM
