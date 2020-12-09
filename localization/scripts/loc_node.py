@@ -44,7 +44,7 @@ class vehicle_params(object):
 def vehicle_name_callback(name):
     global vehicle_name
     vehicle_name = name.data
-    rospy.logwarn("Got vehicle name")
+    rospy.loginfo("Got vehicle name")
 
 def feature_callback(feature_obj):
     global feature_buffer
@@ -87,7 +87,7 @@ def main():
     global feature_buffer, solver, z, u
     # Services:
     #get_time_step = service(vehicle_name+"/robot/get_basic_time_step", get_float)
-    #rospy.logwarn('got services')
+    #rospy.loginfo('got services')
     # Service calls:
     #timestep = get_time_step.srv(True)
     timestep = .01 # in sec, hardcoded bc get_basic_time_step requires world node running in ros
@@ -105,19 +105,27 @@ def main():
     params = vehicle_params()
     model = dynamicsModel(params.car_dict)
     solver.set_model(model)
-    rospy.logwarn('EKF is ready')
+    rospy.loginfo('EKF is ready')
     while not rospy.is_shutdown():
-        rospy.logwarn('prediction')
+        rospy.loginfo('prediction')
         solver.predict(u,timestep)
+        pose = Pose2D(x=solver.x_hat[0],y=solver.x_hat[1],theta=solver.x_hat[2])
+        state_pub.publish(pose)
         if len(feature_buffer) != 0:
-            rospy.logwarn('features')
-            z = z.extend(feature_buffer)
+            rospy.loginfo('features')
+            z = np.concatenate([z,feature_buffer])
+            rospy.loginfo(z)
+            rospy.loginfo(z.shape)
             feature_buffer = []
-        rospy.logwarn('update')
+        rospy.loginfo('update')
         solver.update(z)
         z = z[0:3] # remove features
         pose = Pose2D(x=solver.x[0],y=solver.x[1],theta=solver.x[2])
-        rospy.logwarn('publish state')
+        rospy.loginfo('publish state')
+        print(pose)
+        if np.isnan(pose.x) or np.isnan(pose.y):
+            rospy.logfatal('State estimate is NaN')
+            #raise Exception('State estimate is Nan')
         state_pub.publish(pose)
         for feature in solver.known_features:
             pos = Point(x=feature.state[0],y=0,z=feature.state[1])
