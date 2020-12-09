@@ -46,7 +46,12 @@ class dynamicsModel:
 
         [x,z,a,dx,dz,da] = sp; # x, z, theta, x', z', theta'
         [throttle, brake, desiredSteeringAngle, desiredGear] = input;
-        gearRatio = self.gearRatios[desiredGear];
+        if desiredGear == 0:
+            gearRatio = 0.0001;
+        elif desiredGear == 1:
+            gearRatio = self.gearRatios[1];
+        else:
+            gearRatio = self.gearRatios[0];
 
 
         # rotation matrix from original car orientation
