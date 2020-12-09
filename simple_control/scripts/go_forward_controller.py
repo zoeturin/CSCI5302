@@ -70,8 +70,7 @@ def main():
     # Publishers:
     control_pub = rospy.Publisher('control_command', ControlCommand, queue_size=10)
 
-    while True: #robot.step() != -1:
-        # pc = lidar.getPointCloud();
+    while not rospy.is_shutdown():
         # u = [throttle, brake, desired steering angle, desired gear]
         try:
             throttle = 1
