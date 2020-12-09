@@ -1,10 +1,10 @@
 import numpy as np
-from vehicleDynamicsModel.py import *
+import copy
+from vehicleDynamicsModel import *
 
 '''
 TODO:
-- fix h(), H() to account for vehicle orientation
-- incorporate actual vehicle model in vehicle_model.py
+- fix h() to account for vehicle orientation
 '''
 
 class feature(object):
@@ -31,14 +31,17 @@ class EKF_solver(object):
         self.num_features = 0
         self.feature_loc_bounds = 2 # (meters) bounds where recognize as same feature
         # EKF vectors, matrices:
-        self.x = np.zeros(shape=self.num_states)
-        self.x_hat = np.zeros(shape=self.num_states)
-        self.P = np.zeros(self.num_states)
-        self.P_hat = np.zeros(self.num_states)
+        self.x = np.zeros(self.num_states)
+        self.x_hat = np.zeros(self.num_states)
+        self.P = np.zeros((self.num_states,self.num_states))
+        self.P_hat = np.zeros((self.num_states,self.num_states))
         # model, measurement covariances
-        self.R = np.zeros(self.num_robot_states)
-        self.gps_cov = np.zeros(2)
+        self.R = np.zeros((self.num_robot_states,self.num_robot_states))
+        self.gps_cov = np.zeros((2,2))
         self.gyro_cov = 0
+
+    def set_model(self, model):
+        self.model = model
 
     def handle_feature(self, feature):
         for i in range(len(self.known_features)):
@@ -58,11 +61,11 @@ class EKF_solver(object):
         self.num_features += 1
         self.known_features.append(feature.model)
         # update state x_hat with position of new feature = (0,0):
-        x_new = np.concatenate(self.x_hat, np.zeros(shape=self.states_per_feature))
+        x_new = np.concatenate(self.x_hat, np.zeros(self.states_per_feature))
         self.x_hat = x_new
         # update cov P_hat with inf variances for new feature:
         P_new = np.identity(self.num_states) * np.inf
-        P_new[0:prev_num_states][0:prev_num_states] = self.P_hat
+        P_new[0:prev_num_states,0:prev_num_states] = self.P_hat
         self.P_hat = P_new
 
     def check_in_bounds(self, new_loc, old_loc):
@@ -73,7 +76,8 @@ class EKF_solver(object):
         return result
 
     def predict(self,u,dt):
-        x_hat_robot,G_robot, _ = predictState(u,sp,dt) # what's called G here is F in vehicleDynamicsModel.py (del g/del x)
+        robot_state = self.x[0:self.num_robot_states]
+        x_hat_robot,G_robot, _ = self.model.predictState(u,robot_state,dt) # what's called G here is F in vehicleDynamicsModel.py (del g/del x)
         self.x_hat = self.g(u, x_hat_robot)
         G = self.calc_G(u, G_robot)
         self.P_hat = self.R + self.pre_post_mult(G,self.P)
@@ -84,17 +88,17 @@ class EKF_solver(object):
             feature = z[num_features+i]
             self.handle_feature(feature)
         # create new sensor vector with feature states in place of feature objects:
-        z_new = z[0:num_sensor_meas]
+        z_new = z[0:self.num_sensor_meas]
         for i in range(len(features)):
             np.concatenate([z_new, features[i].state])
         # update matrices
-        H = self.calc_H(z_new, features)
+        H = self.calc_H(self.x_hat, z_new, features)
         Q = self.calc_Q(z_new, len(features))
         K = self.calc_K(H, Q)
         # state update:
-        self.x = self.x_hat + np.matmul(K,(z_new-h(features)))
-        I = np.identity(K.matrix.shape[0])
-        self.P = np.matmul((I-np.matmul(K,self.H)), self.P_hat)
+        self.x = self.x_hat + np.matmul(K,(z_new-self.h(features)))
+        I = np.identity(K.shape[0])
+        self.P = np.matmul((I-np.matmul(K,H)), self.P_hat)
 
     def g(self,u,x_hat_robot):
         x_hat = copy.copy(self.x)
@@ -106,27 +110,30 @@ class EKF_solver(object):
 
     def calc_G(self, u, G_robot):
         G = np.identity(self.num_states)
-        G[0:num_robot_states][0:num_robot_states] = G_robot
+        G[0:self.num_robot_states,0:self.num_robot_states] = G_robot
         return G
 
     def h(self, features):
-        z_pred = np.zeros(shape=self.num_sensor_meas+len(features))
+        z_pred = np.zeros(self.num_sensor_meas+len(features))
         # sensor predictions:
-        z_pred_robot = = np.array([self.x_hat[0], self.x_hat[1], self.x_hat[5]])
+        z_pred_robot = np.array([self.x_hat[0], self.x_hat[1], self.x_hat[5]])
         z_pred[0:self.num_robot_states] = z_pred_robot
         # THIS IS INCORRECT: forgot to acct for orientation in relative position
         # feature predictions:
         for feature in features:
             state_idx = feature.state_idx
-            feature_pred = self.x_hat[state_idx : state_idx+self.states_per_feature]
+            feature_state_pred = self.x_hat[state_idx : state_idx+self.states_per_feature]
+            feature_z_pred = [(self.x_hat[i]-feature_state_pred[i])/np.cos(self.xhat[2]) for i in range(self.states_per_feature)]
             z_idx = feature.meas_idx
-            z_pred[z_idx : z_idx+self.meas_per_feature] = feature_pred # won't work for states_per_feature != meas_per_feature
+            z_pred[z_idx : z_idx+self.meas_per_feature] = feature_z_pred # won't work for states_per_feature != meas_per_feature
         return z_pred
 
     def calc_H(self,x,z_new,features):
         # sensor portion:
-        H = np.zeros(len(z_new),self.num_states)
-        H[0][0],H[1][1],H[2][4] = 1
+        H = np.zeros((len(z_new),self.num_states))
+        H[0,0] = 1
+        H[1,1] = 1
+        H[2,4] = 1
         # THIS IS INCORRECT: forgot to acct for orientation in relative position
         # feature/feature and feature/state portions:
         for feature in features:
@@ -134,26 +141,30 @@ class EKF_solver(object):
             state_idx = feature.state_idx
             for j in range(self.states_per_feature):
                 # identity (del feature)/(del feature) portion:
-                H[meas_idx+j][state_idx+j] = -np.cos(x[2]) # -cos(th)
+                H[meas_idx+j,state_idx+j] = -np.cos(x[2]) # -cos(th)
                 # (del feature)/(del robot_state) portion:
-                H[meas_idx][j] = 1
+                H[meas_idx,j] = 1
         return H
 
     def calc_Q(self, z, num_features):
-        Q = np.zeros(len(z))
-        Q[0:2][0:2] = self.gps_cov
-        Q[2][2] = self.gyro_cov
+        Q = np.zeros((len(z),len(z)))
+        Q[0:2,0:2] = self.gps_cov
+        Q[2,2] = self.gyro_cov
         Q_features = np.identity(num_features) # modify
-        Q[self.num_sensor_meas:-1][self.num_sensor_meas:-1] = Q_features
-        pass
+        Q[self.num_sensor_meas:-1,self.num_sensor_meas:-1] = Q_features
+        return Q
 
     def pre_post_mult(self,A,B):
         # returns A*B*A'
         return np.matmul(A, np.matmul(B, np.transpose(A)))
 
     def calc_K(self, H, Q):
-        inv = np.linalg.inv(self.pre_post_mult(H,self.P_hat)+Q)
-        K = np.matmul(P,np.matmul(np.transpose(H),inv))
+        init_mat = self.pre_post_mult(H,self.P_hat)+Q
+        if np.all(init_mat == 0):
+            inv = np.identity(init_mat.shape[0])*np.inf
+        else:
+            inv = np.linalg.inv(init_mat)
+        K = np.matmul(self.P_hat,np.matmul(np.transpose(H),inv))
         return K
 
     def update_feature_states(self, x_new):
