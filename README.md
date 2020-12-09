@@ -15,7 +15,7 @@ run catkin_make (or catkin build if you prefer)
 
 remember to source (run source devel/setup.bash in the base directory of your catkin workspace)
 
-Open webots separately, open correct world
+Open webots separately (FROM THE TERMINAL OR A LAUNCH FILE), open correct world
 
 Set vehicle controller to "ros_automobile"
 
