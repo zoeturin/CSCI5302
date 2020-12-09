@@ -125,7 +125,7 @@ def main():
         print(pose)
         if np.isnan(pose.x) or np.isnan(pose.y):
             rospy.logfatal('State estimate is NaN')
-            #raise Exception('State estimate is Nan')
+            raise Exception('State estimate is Nan')
         state_pub.publish(pose)
         for feature in solver.known_features:
             pos = Point(x=feature.state[0],y=0,z=feature.state[1])

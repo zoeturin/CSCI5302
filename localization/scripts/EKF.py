@@ -34,10 +34,10 @@ class EKF_solver(object):
         # EKF vectors, matrices:
         self.x = np.zeros(self.num_states)
         self.x_hat = np.zeros(self.num_states)
-        self.P = np.zeros((self.num_states,self.num_states))
-        self.P_hat = np.zeros((self.num_states,self.num_states))
+        self.P = np.identity(self.num_states)*.000001
+        self.P_hat = np.identity(self.num_states)*.000001
         # model, measurement covariances
-        self.R = np.zeros((self.num_robot_states,self.num_robot_states)) # gets updated in self.add_feature
+        self.R = np.identity(self.num_states)*.000001 # gets updated in self.add_feature
         self.gps_cov = np.zeros((2,2))
         self.gyro_cov = 0
 
@@ -50,7 +50,7 @@ class EKF_solver(object):
             if feature.model == known_feature.model:
                 if self.check_in_bounds(feature.state, known_feature.state):
                     feature.set_numbers(known_feature.number, known_feature.state_idx, meas_idx)
-                return
+                    return
         self.add_feature(feature, meas_idx) # if it's a new feature
 
     def add_feature(self, feature, meas_idx):
