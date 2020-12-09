@@ -1,5 +1,5 @@
 import numpy as np
-from vehicle_model.py import *
+from vehicleDynamicsModel.py import *
 
 '''
 TODO:
@@ -72,9 +72,10 @@ class EKF_solver(object):
                 result = False
         return result
 
-    def predict(self,u):
-        self.x_hat = self.g(u)
-        G = self.calc_G(u)
+    def predict(self,u,dt):
+        x_hat_robot,G_robot, _ = predictState(u,sp,dt) # what's called G here is F in vehicleDynamicsModel.py (del g/del x)
+        self.x_hat = self.g(u, x_hat_robot)
+        G = self.calc_G(u, G_robot)
         self.P_hat = self.R + self.pre_post_mult(G,self.P)
 
     def update(self,z):
@@ -95,21 +96,18 @@ class EKF_solver(object):
         I = np.identity(K.matrix.shape[0])
         self.P = np.matmul((I-np.matmul(K,self.H)), self.P_hat)
 
-    def g(self,u):
-        robot_state = self.x[0:self.num_robot_states]
+    def g(self,u,x_hat_robot):
         x_hat = copy.copy(self.x)
-        x_hat[0:self.num_robot_states] = vehicle_model_pred(robot_state, u)
+        x_hat[0:self.num_robot_states] = x_hat_robot
         for i in range(self.num_robot_states, self.num_states):
             for j in range(self.states_per_feature):
                 x_hat[i*self.states_per_feature+j] += x_hat[j]
         return x_hat
 
-    def calc_G(self, u):
-        robot_state = self.x[0:self.num_robot_states]
-        G = vehicle_model_jacobian(robot_state, u)
-        G_full = np.identity(self.num_states)
-        G_full[0:num_robot_states][0:num_robot_states] = G
-        return G_full
+    def calc_G(self, u, G_robot):
+        G = np.identity(self.num_states)
+        G[0:num_robot_states][0:num_robot_states] = G_robot
+        return G
 
     def h(self, features):
         z_pred = np.zeros(shape=self.num_sensor_meas+len(features))
@@ -136,7 +134,7 @@ class EKF_solver(object):
             state_idx = feature.state_idx
             for j in range(self.states_per_feature):
                 # identity (del feature)/(del feature) portion:
-                H[meas_idx+j][state_idx+j] = 1
+                H[meas_idx+j][state_idx+j] = -np.cos(x[2]) # -cos(th)
                 # (del feature)/(del robot_state) portion:
                 H[meas_idx][j] = 1
         return H
