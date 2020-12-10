@@ -33,6 +33,7 @@ class EKF_solver(object):
         self.feature_loc_bounds = 2 # (meters) bounds where recognize as same feature
         # EKF vectors, matrices:
         self.x = np.zeros(self.num_states)
+        self.x[2] = np.pi # for starting facing the opposite direction
         self.x_hat = np.zeros(self.num_states)
         self.P = np.identity(self.num_states)*.1
         self.P_hat = np.identity(self.num_states)*.1
@@ -104,16 +105,21 @@ class EKF_solver(object):
         K = self.calc_K(H, Q)
         # state update:
         self.x = self.x_hat + np.matmul(K,(z_new-self.h(features)))
+        self.x[2] = self.wrap_angle(self.x[2]);
         I = np.identity(K.shape[0])
         self.P = np.matmul((I-np.matmul(K,H)), self.P_hat)
 
     def g(self,u,x_hat_robot):
         x_hat = copy.copy(self.x)
         x_hat[0:self.num_robot_states] = x_hat_robot
+        x_hat[2] = self.wrap_angle(x_hat[2])
         for i in range(self.num_robot_states, self.num_states, 2):
             for j in range(self.states_per_feature):
                 x_hat[i+j] += x_hat[j]
         return x_hat
+
+    def wrap_angle(self,a):
+        return ( (a+np.pi)%(2*np.pi) ) - np.pi;
 
     def calc_G(self, u, G_robot):
         G = np.identity(self.num_states)
@@ -126,11 +132,13 @@ class EKF_solver(object):
         z_pred_robot = np.array([self.x_hat[0], self.x_hat[1], self.x_hat[5]])
         z_pred[0:self.num_sensor_meas] = z_pred_robot
         # THIS IS INCORRECT: forgot to acct for orientation in relative position
+        # ^ Zoe: jk I think I did fix it and forgot to remove this (see cos below)
         # feature predictions:
         for feature in features:
             state_idx = feature.state_idx
             feature_state_pred = self.x_hat[state_idx : state_idx+self.states_per_feature]
             feature_z_pred = [(self.x_hat[i]-feature_state_pred[i])/np.cos(self.x_hat[2]) for i in range(self.states_per_feature)]
+            # ^ Zoe: something wrong with this?
             z_idx = feature.meas_idx
             z_pred[z_idx : z_idx+self.meas_per_feature] = feature_z_pred # won't work for states_per_feature != meas_per_feature
         return z_pred
@@ -149,7 +157,7 @@ class EKF_solver(object):
                 # identity (del feature)/(del feature) portion:
                 H[meas_idx+j,state_idx+j] = -np.cos(x[2]) # -cos(th)
                 # (del feature)/(del robot_state) portion:
-                H[meas_idx,j] = 1
+                H[meas_idx+j,j] = 1
         return H
 
     def calc_Q(self, z, num_features):
@@ -165,6 +173,10 @@ class EKF_solver(object):
         return np.matmul(A, np.matmul(B, np.transpose(A)))
 
     def calc_K(self, H, Q):
+        print("H:")
+        print(H)
+        print("Phat:")
+        print(self.P_hat);
         init_mat = self.pre_post_mult(H,self.P_hat)+Q
         print(init_mat)
         inv = np.linalg.inv(init_mat)
