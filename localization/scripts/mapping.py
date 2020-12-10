@@ -32,13 +32,13 @@ class OccMap():
         occ[0,:] -= pose[0] # find all x-positions of occupancy grid
         occ[1,:] -= pose[1] # find all y-positions of occupancy grid
         r = np.linalg.norm(occ, axis=0) # range for center of mass of cells
-        phi = np.atan2(occ[1,:], occ[0,:]) - pose[2] # calculate phi 
+        phi = np.arctan2(occ[1,:], occ[0,:]) - pose[2] # calculate phi
 
         for z_i in z: # loop through all sensor measurements
             l_free = (abs(phi - z_i[2]) > self.beta/2) # find free cell indices
             l_occ = (abs(r - z_i) < self.alpha/2) # find occupied cell indices
             self.occ_map[l_free] += self.free_threshold # change log-odds probability of free cells
             self.occ_map[l_occ] += self.occupied_threshold # change log-odds probability of occupied cells
-            
+
 if __name__ == '__main__':
     occMap = OccMap(-2, 2, -2 , 2, 1)
