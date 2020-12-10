@@ -102,12 +102,11 @@ def main():
     while not rospy.is_shutdown():
         front_img = np.frombuffer(camera_image, np.uint8).reshape((camera_height, camera_width, 4))
         # no idea where this saves the image:
-        save_result = camera_save_image.srv(filename="~/front_img1.jpg", quality=75)
-        print(save_result)
+        # save_result = camera_save_image.srv(filename="~/front_img1.jpg", quality=75)
+        #print(save_result)
         print('curr steer cmd', steering_angle)
         #yaw = ld.get_steer_cmd("front_img1.jpg", steering_angle)
-        yaw = ld.get_steer_cmd("~/front_img1.jpg", steering_angle)
-        #yaw = ld.get_steer_cmd(front_img, steering_angle, frame_is_array=True)
+        yaw = ld.get_steer_cmd(front_img, steering_angle, frame_is_array=True)
         print("yaw: ", yaw)
         steering_cmd = (yaw-steering_angle) * 0.525
         set_steering_angle.srv(steering_cmd)
