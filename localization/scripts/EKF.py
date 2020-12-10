@@ -34,12 +34,13 @@ class EKF_solver(object):
         # EKF vectors, matrices:
         self.x = np.zeros(self.num_states)
         self.x_hat = np.zeros(self.num_states)
-        self.P = np.identity(self.num_states)*.000001
-        self.P_hat = np.identity(self.num_states)*.000001
+        self.P = np.identity(self.num_states)*.1
+        self.P_hat = np.identity(self.num_states)*.1
         # model, measurement covariances
-        self.R = np.identity(self.num_states)*.000001 # gets updated in self.add_feature
-        self.gps_cov = np.zeros((2,2))
-        self.gyro_cov = 0
+        self.R = np.identity(self.num_states)*.1 # gets updated in self.add_feature
+        self.gps_cov = np.identity(2)*0.1
+        self.gyro_cov = 0.1
+        self.featureQ = 0.1
 
     def set_model(self, model):
         self.model = model
@@ -155,7 +156,7 @@ class EKF_solver(object):
         Q = np.zeros((len(z),len(z)))
         Q[0:2,0:2] = self.gps_cov
         Q[2,2] = self.gyro_cov
-        Q_features = np.identity(num_features*self.meas_per_feature) # modify
+        Q_features = np.identity(num_features*self.meas_per_feature)*self.featureQ # modify
         Q[self.num_sensor_meas:,self.num_sensor_meas:] = Q_features
         return Q
 
@@ -166,10 +167,7 @@ class EKF_solver(object):
     def calc_K(self, H, Q):
         init_mat = self.pre_post_mult(H,self.P_hat)+Q
         print(init_mat)
-        if np.all(init_mat == 0):
-            inv = np.identity(init_mat.shape[0])*9999999
-        else:
-            inv = np.linalg.inv(init_mat)
+        inv = np.linalg.inv(init_mat)
         K = np.matmul(self.P_hat,np.matmul(np.transpose(H),inv))
         return K
 

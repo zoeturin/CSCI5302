@@ -2,6 +2,7 @@
 
 import rospy
 from EKF import *
+
 from ros_service import *
 from std_msgs.msg import String, Bool
 from webots_ros.msg import RecognitionObject
@@ -129,7 +130,7 @@ def main():
         state_pub.publish(pose)
         for feature in solver.known_features:
             pos = Point(x=feature.state[0],y=0,z=feature.state[1])
-            feature_msg = SLAMFeature(position=pos, model=feature.model, feature_id=feature.number)
+            feature_msg = SLAMFeature(position=pos, model=feature.model, feature_id="%s"%feature.number)
             feature_pub.publish(feature_msg)
             if feature.model == 'road':
                 road_pub.publish(feature_msg)

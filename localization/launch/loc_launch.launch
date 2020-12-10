@@ -2,6 +2,5 @@
 <launch>
   <node name="EKF" pkg="localization" type="loc_node.py" output="screen"/>
   <node name="go_forward_controller" pkg="simple_control" type="go_forward_controller.py"/>
-
-
+  <node name="map" pkg="localization" type="mapping_node.py" output="screen"/>
 </launch>
