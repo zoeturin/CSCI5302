@@ -7,6 +7,7 @@ from std_msgs.msg import String
 import numpy as np
 from webots_ros.srv import *
 #from simple_control.srv import *
+from simple_control.msg import ControlCommand
 
 class service(object):
     def __init__(self, path, srv_type):
@@ -66,12 +67,22 @@ def main():
     #enable_lidar.srv(timestep)
     enable_point_cloud.srv(True)
 
+    # Publishers:
+    control_pub = rospy.Publisher('control_command', ControlCommand, queue_size=10)
 
-    while True: #robot.step() != -1:
-        # pc = lidar.getPointCloud();
-
+    while not rospy.is_shutdown():
+        # u = [throttle, brake, desired steering angle, desired gear]
         try:
-            set_throttle.srv(1)
+            throttle = 1
+            brake = 0
+            steering_angle = 0
+            gear = 1
+            u = ControlCommand(throttle=throttle, brake=brake, steering_angle=steering_angle, gear=gear)
+            control_pub.publish(u)
+            set_throttle.srv(throttle)
+            set_brake_intensity.srv(brake)
+            set_steering_angle.srv(steering_angle)
+            set_gear.srv(gear)
         except rospy.ServiceException as e:
             print("Service call failed: %s"%e)
 
