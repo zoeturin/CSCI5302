@@ -2,8 +2,6 @@
 
 import rospy
 from std_msgs.msg import String
-#from controller import Robot, Camera
-# from vehicle import Driver, Car
 import numpy as np
 from webots_ros.srv import *
 #from simple_control.srv import *
@@ -86,27 +84,7 @@ def main():
         except rospy.ServiceException as e:
             print("Service call failed: %s"%e)
 
-
-
-# create the Robot instance.
-#robot = Driver();
-# robot = Car()
-# front_camera = robot.getCamera("front_camera")
-# rear_camera = robot.getCamera("rear_camera")
-# lidar = robot.getLidar('Sick LMS 291');
-#
-# # get the time step of the current world.
-# timestep = int(robot.getBasicTimeStep())
-#
-# MAX_STEER = 1;
-# STEER_SPEED = 10;
-# WHEELBASE = robot.getWheelbase()
-# WHEELTRACK = robot.getTrackFront()
-# MIN_TURN_RADIUS = WHEELBASE/np.tan(MAX_STEER) + WHEELTRACK/2;
-# MAX_SPEED = 138.889;
 vehicle_name = None
 rospy.init_node('controller', anonymous=True)
 rospy.Subscriber("model_name", String, callback)
-#pub = rospy.Publisher(vehicle_name + '/automobile/motor', Float64, queue_size=10)
-#rospy.spin()
 main()
