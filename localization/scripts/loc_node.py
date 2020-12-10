@@ -9,7 +9,7 @@ from webots_ros.msg import RecognitionObject
 from sensor_msgs.msg import NavSatFix, Imu
 from geometry_msgs.msg import Pose2D, Point
 from simple_control.msg import ControlCommand
-from localization.msg import SLAMFeature
+from localization.msg import SLAMFeature, SLAMFeatureArray
 from webots_ros.srv import get_float, automobile_get_dimensions
 '''
 TODO:
@@ -99,19 +99,23 @@ def main():
     rospy.Subscriber("control_command", ControlCommand, control_callback)
     # Publishers:
     state_pub = rospy.Publisher('state_estimate', Pose2D, queue_size=10)
-    feature_pub = rospy.Publisher('features', SLAMFeature, queue_size=50)
-    road_pub = rospy.Publisher('road_features', SLAMFeature, queue_size=50)
+    feature_pub = rospy.Publisher('features', SLAMFeatureArray, queue_size=50)
+    #road_pub = rospy.Publisher('road_features', SLAMFeature, queue_size=50)
     loc_ready_pub = rospy.Publisher('localization_is_ready', Bool, queue_size=10)
     # Vehicle model:
     params = vehicle_params()
     model = dynamicsModel(params.car_dict)
     solver.set_model(model)
     rospy.loginfo('EKF is ready')
+    loc_ready_pub.publish(True)
+
     while not rospy.is_shutdown():
+        # Predict:
         rospy.loginfo('prediction')
         solver.predict(u,timestep)
-        pose = Pose2D(x=solver.x_hat[0],y=solver.x_hat[1],theta=solver.x_hat[2])
-        state_pub.publish(pose)
+        #pose = Pose2D(x=solver.x_hat[0],y=solver.x_hat[1],theta=solver.x_hat[2])
+        #state_pub.publish(pose)
+        # Update:
         if len(feature_buffer) != 0:
             rospy.loginfo('features')
             z = np.concatenate([z,feature_buffer])
@@ -121,6 +125,7 @@ def main():
         rospy.loginfo('update')
         solver.update(z)
         z = z[0:3] # remove features
+        # Publish:
         pose = Pose2D(x=solver.x[0],y=solver.x[1],theta=solver.x[2])
         rospy.loginfo('publish state')
         print(pose)
@@ -128,12 +133,12 @@ def main():
             rospy.logfatal('State estimate is NaN')
             raise Exception('State estimate is Nan')
         state_pub.publish(pose)
+        feature_array = []
         for feature in solver.known_features:
             pos = Point(x=feature.state[0],y=0,z=feature.state[1])
-            feature_msg = SLAMFeature(position=pos, model=feature.model, feature_id="%s"%feature.number)
-            feature_pub.publish(feature_msg)
-            if feature.model == 'road':
-                road_pub.publish(feature_msg)
+            feature_array.append(SLAMFeature(position=pos, model=feature.model, feature_id="%s"%feature.number))
+        feature_pub.publish(SLAMFeatureArray(feature_array=feature_array))
+
 
 vehicle_name = None
 feature_buffer = []

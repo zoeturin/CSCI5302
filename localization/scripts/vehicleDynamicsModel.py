@@ -114,7 +114,7 @@ class dynamicsModel:
         # Angular velocity of differential
         wd = engineAngularVelocity / gearRatio;
         # Torque variation between rear wheels
-        Tv = Td * (wd - (wbr + wbl) / 2) / ((wbr - wbl) / 2);
+        #Tv = Td * (wd - (wbr + wbl) / 2) / ((wbr - wbl) / 2);
         # (not actually finishing this calculation bc we don't need it)
 
         # ENGINE POWER

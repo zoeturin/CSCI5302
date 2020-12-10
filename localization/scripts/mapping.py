@@ -32,6 +32,7 @@ class OccMap():
         occ[0,:] -= pose[0] # find all x-positions of occupancy grid
         occ[1,:] -= pose[1] # find all y-positions of occupancy grid
         r = np.linalg.norm(occ, axis=0) # range for center of mass of cells
+        print(r.shape)
         phi = np.arctan2(occ[1,:], occ[0,:]) - pose[2] # calculate phi
 
         for z_i in z: # loop through all sensor measurements

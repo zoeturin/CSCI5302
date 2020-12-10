@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- <node name="EKF" pkg="localization" type="loc_node.py" output="screen"/> -->
+  <node name="map" pkg="localization" type="mapping_node.py" output="screen"/>
+  <node name="controller_node" pkg="controller" type="lane_follower_node.py"/>
+  <node name="EKF" pkg="localization" type="loc_node.py"/>
   <!-- <node name="go_forward_controller" pkg="simple_control" type="go_forward_controller.py"/> -->
-  <node name="controller_node" pkg="controller" type="lane_follower_node.py" output="screen"/>
-  <!-- <node name="map" pkg="localization" type="mapping_node.py" output="screen"/> -->
+
 </launch>
