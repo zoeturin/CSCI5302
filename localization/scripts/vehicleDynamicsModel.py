@@ -114,7 +114,8 @@ class dynamicsModel:
         # Angular velocity of differential
         wd = engineAngularVelocity / gearRatio;
         # Torque variation between rear wheels
-        Tv = Td * (wd - (wbr + wbl) / 2) / ((wbr - wbl) / 2);
+        #Tv = Td * (wd - (wbr + wbl) / 2) / ((wbr - wbl) / 2);
+        # ^ THIS BLOWS UP IF WHEELS ARE GOING SAME SPEED
         # (not actually finishing this calculation bc we don't need it)
 
         # ENGINE POWER
@@ -133,7 +134,9 @@ class dynamicsModel:
         #LKE = 0.5 * m * v**2;   # linear kinetic energy
         #RKE = 0.5 * I * w**2;   # rotational kinetic energy
         W = Pnet * dt; # net work into the system
-        vn = np.sign(v) * np.sqrt(v**2 + 2 * W / (m + I / (R**2))); # new velocity (speed actually)
+        print("v: "+str(v))
+        print("R: "+str(R))
+        vn = np.sign(v) * np.sqrt(np.maximum(0, v**2 + 2 * W / (m + I / (R**2)))); # new velocity (speed actually)
 
         # GET PREDICTED STATE
         # moment of inertia about apex and angular acceleration (used for partial derivatives and force method)
@@ -209,5 +212,8 @@ class dynamicsModel:
         # combine into matrix:
         F = np.array([dFdx,dFdz,dFda,dFddx,dFddz,dFdda]).T; # with respect to x,z,theta,x',z',theta'
         G = np.array([dFdp,dFdb]).T; # with respect to throttle and brake
+
+        print("old: "+str(sp))
+        print("new: "+str(mu))
 
         return mu,F,G
