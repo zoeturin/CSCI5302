@@ -167,7 +167,7 @@ class EKF_solver(object):
         H = np.zeros((len(z_new),self.num_states))
         H[0,0] = 1
         H[1,1] = 1
-        H[2,4] = 1
+        H[2,5] = 1
         # feature/feature and feature/state portions:
         for feature in features:
             print(feature.model)
