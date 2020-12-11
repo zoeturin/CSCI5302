@@ -108,10 +108,10 @@ def main():
         #yaw = ld.get_steer_cmd("front_img1.jpg", steering_angle)
         yaw = ld.get_steer_cmd(front_img, steering_angle, frame_is_array=True)
         print("yaw: ", yaw)
-        steering_cmd = (yaw-steering_angle) * 0.525
+        steering_cmd = (yaw-steering_angle) * 0.7
         set_steering_angle.srv(steering_cmd)
 
-        cruising_speed = 20
+        cruising_speed = 30
         set_cruising_speed.srv(cruising_speed)
         # u = [throttle, brake, desired steering angle, desired gear]
         u = ControlCommand(throttle=throttle, brake=0, steering_angle=steering_cmd, gear=1)

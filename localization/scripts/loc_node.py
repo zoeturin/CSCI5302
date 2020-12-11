@@ -10,7 +10,7 @@ from sensor_msgs.msg import NavSatFix, Imu
 from geometry_msgs.msg import Pose2D, Point
 from simple_control.msg import ControlCommand
 from localization.msg import SLAMFeature, SLAMFeatureArray
-from webots_ros.srv import get_float, automobile_get_dimensions
+from webots_ros.srv import get_float, automobile_get_dimensions, set_int
 '''
 TODO:
 
@@ -50,8 +50,10 @@ def vehicle_name_callback(name):
 def feature_callback(feature_obj):
     global feature_buffer
     feature_pos = feature_obj.position
+    #print(feature_pos)
     theta = solver.x_hat[2]
     state = np.array([-np.cos(theta)*feature_pos.x, -np.cos(theta)*feature_pos.z])+solver.x_hat[0:2]
+    #print(state)
     feature_new = feature(feature_obj.model, state)
     feature_buffer.append(feature_new)
     rospy.loginfo("Got feature")
@@ -87,11 +89,14 @@ def main():
         pass
     global feature_buffer, solver, z, u
     # Services:
-    #get_time_step = service(vehicle_name+"/robot/get_basic_time_step", get_float)
+    get_time_step = service(vehicle_name+"/robot/get_basic_time_step", get_float)
+    time_step = service(vehicle_name+"/robot/time_step", set_int)
     #rospy.loginfo('got services')
     # Service calls:
-    #timestep = get_time_step.srv(True)
-    timestep = .01 # in sec, hardcoded bc get_basic_time_step requires world node running in ros
+    timestep = get_time_step.srv()
+    timestep = timestep.value
+    timestep_sec = timestep/1000.
+    #timestep = .01 # in sec, hardcoded bc get_basic_time_step requires world node running in ros
     # Subscribers:
     rospy.Subscriber(vehicle_name+"/front_camera/recognition_objects", RecognitionObject, feature_callback)
     rospy.Subscriber(vehicle_name+"/gps/values", NavSatFix, gps_callback)
@@ -99,7 +104,7 @@ def main():
     rospy.Subscriber("control_command", ControlCommand, control_callback)
     # Publishers:
     state_pub = rospy.Publisher('state_estimate', Pose2D, queue_size=10)
-    feature_pub = rospy.Publisher('features', SLAMFeatureArray, queue_size=50)
+    feature_pub = rospy.Publisher('features', SLAMFeatureArray, queue_size=10)
     #road_pub = rospy.Publisher('road_features', SLAMFeature, queue_size=50)
     loc_ready_pub = rospy.Publisher('localization_is_ready', Bool, queue_size=10)
     # Vehicle model:
@@ -112,15 +117,14 @@ def main():
     while not rospy.is_shutdown():
         # Predict:
         rospy.loginfo('prediction')
-        solver.predict(u,timestep)
+        solver.predict(u,timestep_sec)
         #pose = Pose2D(x=solver.x_hat[0],y=solver.x_hat[1],theta=solver.x_hat[2])
         #state_pub.publish(pose)
         # Update:
         if len(feature_buffer) != 0:
+            features = copy.copy(feature_buffer)
             rospy.loginfo('features')
-            z = np.concatenate([z,feature_buffer])
-            rospy.loginfo(z)
-            rospy.loginfo(z.shape)
+            z = np.concatenate([z,features])
             feature_buffer = []
         rospy.loginfo('update')
         solver.update(z)
@@ -128,7 +132,6 @@ def main():
         # Publish:
         pose = Pose2D(x=solver.x[0],y=solver.x[1],theta=solver.x[2])
         rospy.loginfo('publish state')
-        print(pose)
         if np.isnan(pose.x) or np.isnan(pose.y):
             rospy.logfatal('State estimate is NaN')
             raise Exception('State estimate is Nan')
@@ -138,6 +141,7 @@ def main():
             pos = Point(x=feature.state[0],y=0,z=feature.state[1])
             feature_array.append(SLAMFeature(position=pos, model=feature.model, feature_id="%s"%feature.number))
         feature_pub.publish(SLAMFeatureArray(feature_array=feature_array))
+        time_step.srv(1)
 
 
 vehicle_name = None

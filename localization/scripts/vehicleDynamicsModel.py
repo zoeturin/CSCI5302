@@ -134,8 +134,8 @@ class dynamicsModel:
         #LKE = 0.5 * m * v**2;   # linear kinetic energy
         #RKE = 0.5 * I * w**2;   # rotational kinetic energy
         W = Pnet * dt; # net work into the system
-        print("v: "+str(v))
-        print("R: "+str(R))
+        #print("v: "+str(v))
+        #print("R: "+str(R))
         vn = np.sign(v) * np.sqrt(np.maximum(0, v**2 + 2 * W / (m + I / (R**2)))); # new velocity (speed actually)
 
         # GET PREDICTED STATE
@@ -213,7 +213,7 @@ class dynamicsModel:
         F = np.array([dFdx,dFdz,dFda,dFddx,dFddz,dFdda]).T; # with respect to x,z,theta,x',z',theta'
         G = np.array([dFdp,dFdb]).T; # with respect to throttle and brake
 
-        print("old: "+str(sp))
-        print("new: "+str(mu))
+        #print("old: "+str(sp))
+        #print("new: "+str(mu))
 
         return mu,F,G
