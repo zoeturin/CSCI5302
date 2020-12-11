@@ -30,14 +30,15 @@ class EKF_solver(object):
         self.meas_per_feature = 2 # x,z
         self.known_features = []
         self.num_features = 0
-        self.feature_loc_bounds = 2 # (meters) bounds where recognize as same feature
+        self.feature_loc_bounds = 4 # (meters) bounds where recognize as same feature
+        self.blacklisted_features = ['road line', 'crash barrier', 'road border'] #['road line']
         # EKF vectors, matrices:
         self.x = np.zeros(self.num_states)
         self.x[2] = np.pi # for starting facing the opposite direction
         self.x_hat = np.zeros(self.num_states)
         self.P = np.identity(self.num_states)*.1
         self.P_hat = np.identity(self.num_states)*.1
-        # model, measurement covariances
+        # model, measurement covariances:
         self.R = np.identity(self.num_states)*.1 # gets updated in self.add_feature
         self.gps_cov = np.identity(2)*0.1
         self.gyro_cov = 0.1
@@ -47,13 +48,20 @@ class EKF_solver(object):
         self.model = model
 
     def handle_feature(self, feature, meas_idx):
-        for known_feature in self.known_features:
+        for i in range(len(self.known_features)):
+            known_feature = self.known_features[i]
             # check if we already have this feature (have one with same model w/in bounds):
             if feature.model == known_feature.model:
                 if self.check_in_bounds(feature.state, known_feature.state):
+                    self.known_features[i] = feature
                     feature.set_numbers(known_feature.number, known_feature.state_idx, meas_idx)
                     return
-        self.add_feature(feature, meas_idx) # if it's a new feature
+        if feature.model not in self.blacklisted_features:
+            print(feature.model)
+            print(feature.state)
+            self.add_feature(feature, meas_idx) # if it's a new feature
+        else:
+            feature.model = None
 
     def add_feature(self, feature, meas_idx):
         prev_num_states = self.num_states
@@ -88,13 +96,22 @@ class EKF_solver(object):
         self.x_hat = self.g(u, x_hat_robot)
         G = self.calc_G(u, G_robot)
         self.P_hat = self.R + self.pre_post_mult(G,self.P)
+        # print(self.P_hat)
 
     def update(self,z):
-        features = z[self.num_sensor_meas:-1]
+        features = z[self.num_sensor_meas:]
         self.num_meas = self.num_sensor_meas + len(features)*self.meas_per_feature
-        for i in range(len(features)):
+        i=0
+        while i < len(features):
             meas_idx = self.num_sensor_meas + i*self.meas_per_feature
             self.handle_feature(features[i], meas_idx)
+            if features[i].model is None:
+                self.num_meas -= self.meas_per_feature
+                z = np.concatenate([z[0:self.num_sensor_meas+i],z[self.num_sensor_meas+i+self.meas_per_feature:]])
+                features = np.concatenate([features[0:i],features[i+1:]])
+                i -= 1
+            i += 1
+        self.num_meas = self.num_sensor_meas + len(features)*self.meas_per_feature
         # create new sensor vector with feature states in place of feature objects:
         z_new = z[0:self.num_sensor_meas]
         for i in range(len(features)):
@@ -108,6 +125,7 @@ class EKF_solver(object):
         self.x[2] = self.wrap_angle(self.x[2]);
         I = np.identity(K.shape[0])
         self.P = np.matmul((I-np.matmul(K,H)), self.P_hat)
+        self.update_feature_states(self.x)
 
     def g(self,u,x_hat_robot):
         x_hat = copy.copy(self.x)
@@ -145,12 +163,15 @@ class EKF_solver(object):
 
     def calc_H(self,x,z_new,features):
         # sensor portion:
+        print(features)
         H = np.zeros((len(z_new),self.num_states))
         H[0,0] = 1
         H[1,1] = 1
         H[2,4] = 1
         # feature/feature and feature/state portions:
         for feature in features:
+            print(feature.model)
+            print(feature.state_idx)
             meas_idx = feature.meas_idx
             state_idx = feature.state_idx
             for j in range(self.states_per_feature):
@@ -173,12 +194,12 @@ class EKF_solver(object):
         return np.matmul(A, np.matmul(B, np.transpose(A)))
 
     def calc_K(self, H, Q):
-        print("H:")
-        print(H)
-        print("Phat:")
-        print(self.P_hat);
+        # print("H:")
+        # print(H)
+        # print("Phat:")
+        # print(self.P_hat);
         init_mat = self.pre_post_mult(H,self.P_hat)+Q
-        print(init_mat)
+        #print(init_mat)
         inv = np.linalg.inv(init_mat)
         K = np.matmul(self.P_hat,np.matmul(np.transpose(H),inv))
         return K

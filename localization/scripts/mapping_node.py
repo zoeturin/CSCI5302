@@ -24,15 +24,14 @@ def state_est_callback(data):
 
 def feature_callback(data):
     global feature_pose_buffer, feature_buffer
-    feature_buffer = data.feature_array
+    blacklist = ['road','road border']
+    feature_buffer = []
     feature_pose_buffer = []
     for feature in data.feature_array:
         pose = [feature.position.x, feature.position.z, 0] # update theta in the future?
-        if feature.model == 'road':
-            # road_buffer.append(pose)
-            pass
-        else:
+        if feature.model not in blacklist:
             feature_pose_buffer.append(pose)
+            feature_buffer.append(feature)
 
 def tf_coords_for_display(coords, disp_mins, scaling=1):
     new_coords = copy.copy(coords)
@@ -47,7 +46,7 @@ def main():
     global feature_pose_buffer, feature_buffer, vehicle_name
     map_range = [[-50, 50],[-100, 100]] # [[xmin, xmax],[ymin,ymax]]
     map_mins = [map_range[0][0], map_range[1][0]]
-    occMap = OccMap(map_range[0][0],map_range[0][1],map_range[1][0],map_range[1][1], 1)
+    #occMap = OccMap(map_range[0][0],map_range[0][1],map_range[1][0],map_range[1][1], 1)
     #roadMap = OccMap(map_range[0][0],map_range[0][1],map_range[1][0],map_range[1][1], 1)
     while vehicle_name is None:
         pass
@@ -72,8 +71,9 @@ def main():
             #occMap.update_map(pose, feature_pose_buffer)
             if enable_map_display:
                 print('drawing')
-                print(len(feature_buffer))
+                print(len(feature_pose_buffer))
                 for feature in feature_buffer:
+                    #print(feature.model)
                     set_color.srv(255*65536+255*256+255) # white
                     #draw_text.srv(text=feature.model,x=feature.position.x,y=feature.position.z)
                     # feature_pos = [feature.position.x, feature.position.z]
