@@ -188,7 +188,7 @@ class dynamicsModel:
 
         dFdx = np.array([1,0,0,0,0,0]);
         dFdz = np.array([0,1,0,0,0,0]);
-        dFda = np.array([0,0,2, \
+        dFda = np.array([0,0,1, \
             dt*(R*dda*-np.sin(a) - da**2 * R*np.cos(a)), \
             dt*(R*dda*-np.cos(a) + da**2 * R*np.sin(a)), \
             0]);
