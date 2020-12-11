@@ -1,21 +1,18 @@
 <?xml version="1.0"?>
 <launch>
+  <param name="use_sim_time" type="bool" value="true" />
   <arg name="no_gui" default="false," doc="Start Webots with minimal GUI"/>
   <include file="$(find webots_ros)/launch/webots.launch">
     <arg name="mode" value="realtime"/>
     <arg name="no_gui" value="$(arg no_gui)"/>
     <arg name="world" value="/home/zoe/Documents/Classes/CSCI_5302/Final/CSCI5302-AVChallenge/worlds/CSCI5302-AVChallenge.wbt"/>
-    <param name="/use_sim_time" type="bool" value="true" />
   </include>
 
   <node name="map" pkg="localization" type="mapping_node.py">
-    <param name="/use_sim_time" type="bool" value="true" />
   </node>
-  <node name="controller_node" pkg="controller" type="lane_follower_node.py">
-    <param name="/use_sim_time" type="bool" value="true" />
+  <node name="controller_node" pkg="controller" type="lane_follower_node.py" output="screen">
   </node>
-  <node name="EKF" pkg="localization" type="loc_node.py"  output="screen">
-    <param name="/use_sim_time" type="bool" value="true" />
+  <node name="EKF" pkg="localization" type="loc_node.py" >
   </node>
   <!-- <node name="go_forward_controller" pkg="simple_control" type="go_forward_controller.py"/> -->
 

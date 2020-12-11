@@ -10,7 +10,7 @@ def detect_edges(frame):
     2. Adjust gamma value to make lane lines stand out more
     3. Applies Gaussian filter to smooth out sharp edges
     4. Find edges using Canny Edge detection
-    
+
     @ param frame: image from front camera
     @ returns: image with lane line edges found
     '''
@@ -37,7 +37,7 @@ def region_of_interest(frame):
     left_top = [0, height * 0.875] # define left top coordinate point
     right_top = [width, height * 0.875] # define right top coordinate point
     vertices = np.array([[left_bottom, left_top, right_top, right_bottom]], dtype=np.int32)
-    
+
     if len(mask.shape) == 2:
         cv2.fillPoly(mask, vertices, 255)
     else:
@@ -49,11 +49,11 @@ def gaussian_smoothing(frame, kernel_size = 5):
     """
     Apply Gaussian filter to the input image. Called by detect_edges.
     Modified from: https://github.com/dctian/DeepPiCar/blob/master/driver/code/hand_coded_lane_follower.py
-    
+
     @param image: An np.array compatible with plt.imshow
     @param kernel_size (Default = 13): The size of the Gaussian kernel will affect the performance of the detector.
                                        It must be an odd number (3, 5, 7, ...)
-    @returns: image with applied Gaussian filter. Needed for better edge detection. 
+    @returns: image with applied Gaussian filter. Needed for better edge detection.
     """
     return cv2.GaussianBlur(frame, (kernel_size, kernel_size), 0)
 
@@ -69,7 +69,7 @@ def adjust_gamma(frame, gamma=0.30):
     invGamma = 1.0 / gamma
     table = np.array([((i / 255.0) ** invGamma) * 255
         for i in np.arange(0, 256)]).astype("uint8")
-    
+
     # apply gamma correction using the lookup table
     return cv2.LUT(frame, table)
 
@@ -85,7 +85,7 @@ def detect_line_segments(cropped_edges):
     rho = 1  # distance precision in pixel, i.e. 1 pixel
     angle = np.pi / 180  # angular precision in radian, i.e. 1 degree
     min_threshold = 10  # minimal of votes
-    line_segments = cv2.HoughLinesP(cropped_edges, rho, angle, min_threshold, 
+    line_segments = cv2.HoughLinesP(cropped_edges, rho, angle, min_threshold,
                                     np.array([]), minLineLength=15, maxLineGap=12)
 
     return line_segments
@@ -97,7 +97,7 @@ def average_slope_intercept(frame, line_segments):
 
     @param frame: original image from front camera
     @param line_segments: line segments found by detect_line_segments
-    @returns: average of lines found 
+    @returns: average of lines found
     """
     lane_lines = []
     if line_segments is None:
@@ -175,7 +175,7 @@ def show_image(title, frame):
     cv2.waitKey(0) # exit window by pressing any of the arrow keys
 
 def calc_steer_cmd(lane_lines, frame):
-    """ 
+    """
     Find the steering angle based on lane line coordinate
 
     @param lane_lines: lane lines detected
@@ -184,7 +184,7 @@ def calc_steer_cmd(lane_lines, frame):
     """
     if len(lane_lines) == 0:
         return 0
-    
+
     height, width, _ = frame.shape
     if len(lane_lines) == 1: # if only one lane line is detected
         x1, y1, x2, y2 = lane_lines[0][0]
@@ -204,13 +204,13 @@ def calc_steer_cmd(lane_lines, frame):
     x_offset = halfpoint[0] - base_point[0]
     y_offset = halfpoint[1] - base_point[1]
 
-    # generate steer command for vehicle    
+    # generate steer command for vehicle
     steer_cmd = math.atan2(y_offset, x_offset) + np.pi/2
 
     return steer_cmd
 
 def calc_steer_cmd2(lane_lines, frame):
-    """ 
+    """
     Find the steering angle based on lane line coordinate
 
     FOR TESTING PURPOSES BUT SAME AS CALC_STEER_CMD function
@@ -221,7 +221,7 @@ def calc_steer_cmd2(lane_lines, frame):
     """
     if len(lane_lines) == 0:
         return 0
-    
+
     height, width, _ = frame.shape
     if len(lane_lines) == 1: # if only one lane line is detected
         print("one line detected")
@@ -254,7 +254,7 @@ def calc_steer_cmd2(lane_lines, frame):
     y_offset = halfpoint[1] - base_point[1]
      # plot steering cmd line in yellow. For development purposes
     cv2.line(frame, base_point, halfpoint, (30, 255, 255), 3) # plot steering cmd line in yellow
-    
+
     # generate steer command for vehicle
     steer_cmd = math.atan2(y_offset, x_offset) + np.pi/2
     print("x_offset ", x_offset)
@@ -263,21 +263,24 @@ def calc_steer_cmd2(lane_lines, frame):
 
     return steer_cmd, frame
 
-def get_steer_cmd(frame_, curr_steer_angle):
+def get_steer_cmd(frame_, curr_steer_angle, frame_is_array=False):
     '''
     Function used by Webots simulator to generate steering command given image from front camera
 
     @param frame: image from Tesla Model 3 front camera
     @param curr_steer_angle: vehicle's current steering angle (for signal smoothing purposes)
-    @returns: steering command for vehicle 
+    @returns: steering command for vehicle
     '''
-    frame = cv2.imread(frame_) # read in image
-    edges = detect_edges(frame) # detect edges 
+    if not frame_is_array:
+        frame = cv2.imread(frame_) # read in image
+    else:
+        frame = frame_
+    edges = detect_edges(frame) # detect edges
 
     cropped_edges = region_of_interest(edges) # crop image
 
     line_segments = detect_line_segments(cropped_edges) # find coordinates of lines found
-    line_segment_image = display_lines(frame, line_segments) 
+    line_segment_image = display_lines(frame, line_segments)
 
     lane_lines = average_slope_intercept(frame, line_segments) # average lane line slopes and intercepts
     if not lane_lines: # if no lane lines found then apply previous steering command
@@ -288,7 +291,7 @@ def get_steer_cmd(frame_, curr_steer_angle):
     if lane_lines: # if lane lines were found then find a steering command for the vehicle
         steer_cmd = calc_steer_cmd(lane_lines, lane_lines_image)
     else:
-        steer_cmd = curr_steer_angle # if no steering command could be generated then 
+        steer_cmd = curr_steer_angle # if no steering command could be generated then
 
     # clip steering angle to vehicle limits
     max_angle = 1
@@ -322,16 +325,16 @@ def main():
         cv2.imwrite('path_and_cmd.jpg', tmp_frame)
     else:
         steer_cmd = 0
-    
+
     max_angle = np.pi/6
     if steer_cmd > max_angle:
         steer_cmd = max_angle
     elif steer_cmd < -max_angle:
         steer_cmd = -max_angle
-    
+
     print("steering command ", steer_cmd)
     print("steering command in degrees ", steer_cmd * 180/np.pi)
 
 
 if __name__ == '__main__':
-    main()    
+    main()

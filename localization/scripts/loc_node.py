@@ -10,7 +10,8 @@ from sensor_msgs.msg import NavSatFix, Imu
 from geometry_msgs.msg import Pose2D, Point
 from simple_control.msg import ControlCommand
 from localization.msg import SLAMFeature, SLAMFeatureArray
-from webots_ros.srv import get_float, automobile_get_dimensions, set_int
+from webots_ros.srv import get_float, set_int #, automobile_get_dimensions
+from simple_control.srv import automobile_get_dimensions
 '''
 TODO:
 
@@ -22,9 +23,13 @@ class vehicle_params(object):
         get_dimensions = service(vehicle_name+"/automobile/get_dimensions", automobile_get_dimensions)
         # Service calls:
         dims = get_dimensions.srv()
+        # print('got dims')
         self.TRACK = dims.trackRear
         self.BASE = dims.wheelBase
         self.WHEEL = dims.frontWheelRadius
+        # self.TRACK = 1.72
+        # self.BASE = 2.94
+        # self.WHEEL = .36
         self.create_car_dict()
 
     def create_car_dict(self):
@@ -72,30 +77,20 @@ def gps_callback(data):
     pass
 
 def gyro_callback(data):
-    global solver
+    global solver, z
     th_dot = data.angular_velocity.y
+    z[2] = th_dot
     cov = data.angular_velocity_covariance
-    solver.gyro_cov = cov[4]
+    solver.gyro_cov = cov[4] + .0001
 
 def control_callback(data):
     global u
     u = [data.throttle, data.brake, data.steering_angle, data.gear]
 
-def init_vehicle_model():
-    pass
-
 def main():
     while vehicle_name is None:
         pass
     global feature_buffer, solver, z, u
-    # Services:
-    get_time_step = service(vehicle_name+"/robot/get_basic_time_step", get_float)
-    time_step = service(vehicle_name+"/robot/time_step", set_int)
-    #rospy.loginfo('got services')
-    # Service calls:
-    timestep = get_time_step.srv()
-    timestep = timestep.value
-    timestep_sec = timestep/1000.
     #timestep = .01 # in sec, hardcoded bc get_basic_time_step requires world node running in ros
     # Subscribers:
     rospy.Subscriber(vehicle_name+"/front_camera/recognition_objects", RecognitionObject, feature_callback)
@@ -107,13 +102,22 @@ def main():
     feature_pub = rospy.Publisher('features', SLAMFeatureArray, queue_size=10)
     #road_pub = rospy.Publisher('road_features', SLAMFeature, queue_size=50)
     loc_ready_pub = rospy.Publisher('localization_is_ready', Bool, queue_size=10)
+    # Services:
+    get_time_step = service(vehicle_name+"/robot/get_basic_time_step", get_float)
+    time_step = service(vehicle_name+"/robot/time_step", set_int)
+    rospy.loginfo('got services')
     # Vehicle model:
     params = vehicle_params()
     model = dynamicsModel(params.car_dict)
     solver.set_model(model)
+
+    # Service calls:
+    timestep = get_time_step.srv()
+    timestep = timestep.value
+    # timestep = 10
+    timestep_sec = timestep/1000.
     rospy.loginfo('EKF is ready')
     loc_ready_pub.publish(True)
-
     while not rospy.is_shutdown():
         # Predict:
         rospy.loginfo('prediction')
@@ -141,7 +145,7 @@ def main():
             pos = Point(x=feature.state[0],y=0,z=feature.state[1])
             feature_array.append(SLAMFeature(position=pos, model=feature.model, feature_id="%s"%feature.number))
         feature_pub.publish(SLAMFeatureArray(feature_array=feature_array))
-        time_step.srv(1)
+        #time_step.srv(int(timestep))
 
 
 vehicle_name = None

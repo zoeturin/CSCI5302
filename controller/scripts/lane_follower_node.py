@@ -60,6 +60,7 @@ def main():
     # Misc
     get_dimensions = service("/automobile/get_dimensions", automobile_get_dimensions)
     get_time_step = service("/robot/get_basic_time_step", get_float)
+    time_step = service("/robot/time_step", set_int)
     # Front camera
     enable_front_camera = service("/front_camera/enable", set_int)
     enable_recognition = service("/front_camera/recognition_enable", set_int)
@@ -79,8 +80,12 @@ def main():
     TRACK = dims.trackRear
     BASE = dims.wheelBase
     WHEEL = dims.frontWheelRadius
-    #timestep = get_time_step.srv()
-    timestep = 10 # hard code if not running webots from launch file
+    # TRACK = 1.72
+    # BASE = 2.94
+    # WHEEL = .36
+    timestep = get_time_step.srv()
+    timestep = int(timestep.value)
+    # timestep = 10 # hard code if not running webots from launch file
     # Front camera
     enable_front_camera.srv(30)
     enable_recognition.srv(1)
@@ -88,8 +93,8 @@ def main():
     camera_width = info.width
     camera_height = info.height
     # Other sensors
-    enable_gps.srv(1)
-    enable_gyro.srv(1)
+    enable_gps.srv(timestep)
+    enable_gyro.srv(timestep)
     enable_lidar.srv(timestep)
     enable_point_cloud.srv(True)
     # Control
@@ -116,6 +121,7 @@ def main():
         # u = [throttle, brake, desired steering angle, desired gear]
         u = ControlCommand(throttle=throttle, brake=0, steering_angle=steering_cmd, gear=1)
         control_pub.publish(u)
+        time_step.srv(int(timestep))
 
 camera_image = None
 vehicle_name = None

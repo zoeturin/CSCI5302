@@ -57,8 +57,8 @@ class EKF_solver(object):
                     feature.set_numbers(known_feature.number, known_feature.state_idx, meas_idx)
                     return
         if feature.model not in self.blacklisted_features:
-            print(feature.model)
-            print(feature.state)
+            #print(feature.model)
+            #print(feature.state)
             self.add_feature(feature, meas_idx) # if it's a new feature
         else:
             feature.model = None
@@ -163,15 +163,15 @@ class EKF_solver(object):
 
     def calc_H(self,x,z_new,features):
         # sensor portion:
-        print(features)
+        #print(features)
         H = np.zeros((len(z_new),self.num_states))
         H[0,0] = 1
         H[1,1] = 1
         H[2,5] = 1
         # feature/feature and feature/state portions:
         for feature in features:
-            print(feature.model)
-            print(feature.state_idx)
+            #print(feature.model)
+            #print(feature.state_idx)
             meas_idx = feature.meas_idx
             state_idx = feature.state_idx
             for j in range(self.states_per_feature):
