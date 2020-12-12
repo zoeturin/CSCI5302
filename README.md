@@ -35,7 +35,7 @@ TEST CONTROLLER AND EKF: ----------------------------------------------------
 
 The EKF should be initialized with a decent initial position estimate. By default it is set to x = 0, z = 0, theta = pi
 
-set the path in loc_launch.launch (in the localization package) to the desired world file (this file should be configured as described above). The world file we used for testing is in controller/worlds
+set the path in loc_launch.launch (in the localization package) to the desired world file (this file should be configured as described above). The main world file we used for testing, along with a custom track we tested on, are in controller/worlds
 
 run roslaunch localization loc_launch.launch
 
