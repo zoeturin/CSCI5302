@@ -29,9 +29,11 @@ The accuracy of the GPS should be set to a non-zero value.
 
 You may have to set the WEBOTS_HOME environment variable as described in the webots documentation
 
+The basic timestep for the world should be 5 ms.
+
 TEST CONTROLLER AND EKF: ----------------------------------------------------
 
-set the path in loc_launch.launch (in the localization package) to the desired world file (this file should be configured as described above)
+set the path in loc_launch.launch (in the localization package) to the desired world file (this file should be configured as described above). The world file we used for testing is in controller/worlds
 
 run roslaunch localization loc_launch.launch
 
