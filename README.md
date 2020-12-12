@@ -1,6 +1,8 @@
 # CSCI5302
 Advanced robotics final project
 
+VIDEO DEMOS: https://photos.app.goo.gl/hWBcJo55D48Yhdxx7
+
 USING ROS: -----------------------------------------------------------------
 
 To install webots_ros: 
