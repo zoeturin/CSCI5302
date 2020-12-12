@@ -31,6 +31,8 @@ You may have to set the WEBOTS_HOME environment variable as described in the web
 
 The basic timestep for the world should be 5 ms.
 
+The front camera should have a recognition object added.
+
 TEST CONTROLLER AND EKF: ----------------------------------------------------
 
 The EKF should be initialized with a decent initial position estimate. By default it is set to x = 0, z = 0, theta = pi
