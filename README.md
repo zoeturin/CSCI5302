@@ -45,7 +45,11 @@ This will run the controller and the EKF. EKF state estimates are published to t
 
 TEST PARALLEL PARKING: ------------------------------------------------------
 
-[Leo pls add instructions here]
+The lidar sensor z position needs to be adjusted to 0.15m.
+
+If the original starting angular position is changed, then this needs to be updated in the code where the state estimate is initialized. The third variable needs to be adjusted accordingly. If the linear position is changed then no alteration of the code is required. 
+
+It is not expected that the car can park in the smaller space, but it can park in the larger space behind the Mercedes van and in front of the BMW.
 
 PACKAGES: --------------------------------------------------------------------
 
